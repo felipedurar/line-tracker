@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native","darwin","debian-openssl-1.1.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id    Int     @default(autoincrement()) @id
+  uuid  String  @db.VarChar(36)
+  email String  @unique   @db.VarChar(64)
+  username  String  @unique   @db.VarChar(32)
+  password  String  @db.VarChar(128)
+  name  String?
+  
+  manifestsCreated   Manifest[]
+}
+
+model Device {
+  id    Int     @default(autoincrement()) @id
+  uuid  String  @db.VarChar(36)
+  deviceType  DeviceType
+  hardwareId  String @db.VarChar(256)
+  //publicKey String? @db.VarChar(600)
+  deviceName  String?
+  nickname  String?
+  description String?
+
+}
+
+enum DeviceType {
+  pc
+  iot
+}
+
+model Manifest {
+  id    Int     @default(autoincrement()) @id
+  uuid  String  @db.VarChar(36)
+  createdAt   DateTime
+
+  createdBy      User     @relation(fields: [createdById], references: [id])
+  createdById    Int
+
+  manifest String?  @db.Text
+  
+}

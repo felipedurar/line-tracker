@@ -1,0 +1,69 @@
+version: '3.8'
+
+services:
+  # MySQL (All Services in the same database)
+  mysqldb:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - 3307:3306
+    networks:
+      - net-internal
+      - net-external
+    volumes: 
+      - lina-db-config:/etc/mysql
+      - lina-db-data:/var/lib/mysql
+    logging:
+      driver: none
+
+  linaagent-core:
+    build:
+      context: ./
+      dockerfile: ./dockerfile
+    image: linaagent-core
+    environment:
+      # Database Setings
+      DATABASE_URL: mysql://root:123456@mysqldb:3306/linaagent?schema=public
+
+      # # Authentication Settings (YES,I KNOW I CANT COMMIT THESE KEYS, BUT IT IS JUST FOR TEST FOR NOW)
+      DEVICE_TOKEN_SECRET: InHfMpZwySgIglrNvr1dtNU0XTDPEVnQLSn7y+I9Galdp7OYJNJ+1vxaKa/QsywC
+      JWT_SECRET: InHfMpZwySgIglrNvr1dtNU0XTDPEVnQLSn7y+I9Galdp7OYJNJ+1vxaKa/QsywC
+      JWT_REFRESH_SECRET: InHfMpZwySgIglrNvr1dtNU0XTDPEVnQLSn7y+I9Galdp7OYJNJ+1vxaKa/QsywC
+    ports:
+      - 3000:3000
+    networks:
+      - net-internal
+      - net-external
+
+  # Redis
+  redis:
+    image: redis:7
+    restart: always
+    ports:
+      - 6379:6379
+    networks:
+      - net-internal
+    volumes:
+      - lina-redis-data:/data
+    logging:
+      driver: none
+
+volumes: 
+  lina-db-config:
+  lina-db-data:
+  lina-redis-data:
+
+networks:
+  net-internal:
+    name: net-internal
+    driver: bridge
+    internal: true
+    driver_opts:
+      com.docker.network.bridge.name: dockerinter
+  net-external:
+    name: net-external
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: dockerback
