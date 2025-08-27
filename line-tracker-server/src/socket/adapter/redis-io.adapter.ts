@@ -9,12 +9,12 @@ import * as jwt from 'jsonwebtoken';
 export class RedisIoAdapter extends IoAdapter {
   private adapterConstructor: ReturnType<typeof createAdapter>;
 
-    public constructor(
-        private readonly app: INestApplicationContext,
-        private readonly configService: ConfigService
-    ) {
-        super(app);
-    }
+  public constructor(
+    private readonly app: INestApplicationContext,
+    private readonly configService: ConfigService
+  ) {
+    super(app);
+  }
 
   async connectToRedis(): Promise<void> {
     const pubClient = new createClient({ host: 'redis', port: 6379 });
@@ -25,12 +25,18 @@ export class RedisIoAdapter extends IoAdapter {
   }
 
   createIOServer(port: number, options?: any): any {
-    const server = super.createIOServer(port, options);
+    const server = super.createIOServer(port, {
+      ...options,
+      cors: {
+        origin: "*", // adjust to match the frontend
+        methods: ["GET", "POST"],
+      },
+    });
     server.adapter(this.adapterConstructor);
-    
-    const jwtSecret: string = this.configService.get<string>('JWT_SECRET') as string;
 
-    // 🔐 Authentication middleware
+    const jwtSecret: string = this.configService.get<string>('DEVICE_TOKEN_SECRET') as string;
+
+    // Authentication middleware
     server.use((socket, next) => {
       const token = socket.handshake.auth?.token;
       if (!token) return next(new Error('No token'));

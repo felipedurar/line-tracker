@@ -10,6 +10,7 @@ import { DevicesModule } from './devices/devices.module';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { SocketModule } from './socket/socket.module';
+import { FileSystemModule } from './file-system/file-system.module';
 
 @Module({
   imports: [
@@ -23,7 +24,7 @@ import { SocketModule } from './socket/socket.module';
     AuthModule, 
     UsersModule, 
     ManifestModule, 
-    DevicesModule, SocketModule
+    DevicesModule, SocketModule, FileSystemModule
   ],
   controllers: [AppController],
   providers: [
