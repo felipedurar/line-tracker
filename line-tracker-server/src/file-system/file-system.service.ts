@@ -1,4 +1,4 @@
-import { Get, Injectable, Param } from '@nestjs/common';
+import { Get, Injectable, NotFoundException, Param } from '@nestjs/common';
 import { AgentGateway } from 'src/socket/agent.gateway';
 import * as path from 'path';
 
@@ -19,7 +19,7 @@ export class FileSystemService {
         //this.gateway.server.timeout(10000)
 
 
-        return await new Promise((resolve, reject) => {
+        const result = await new Promise((resolve, reject) => {
             this.gateway.server
                 .timeout(10000)
                 .to(`agent:${agentId}`)
@@ -29,6 +29,10 @@ export class FileSystemService {
                     resolve(responses?.[0] ?? null);
                 });
         });
+        if (!result)
+            throw new NotFoundException(`The agentid ${agentId} is not connected!`);
+        
+        return result;
     }
 
     // //@Get(':agentId/files')

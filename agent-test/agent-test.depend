@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1756472681 source:/home/felipe_malaquias/Repositories/line-tracker/agent-test/main.cpp
+	<sio_client.h>
+	<iostream>
+	<thread>
+	<chrono>
+

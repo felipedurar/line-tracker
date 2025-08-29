@@ -37,18 +37,24 @@ export class RedisIoAdapter extends IoAdapter {
     const jwtSecret: string = this.configService.get<string>('DEVICE_TOKEN_SECRET') as string;
 
     // Authentication middleware
-    server.use((socket, next) => {
-      const token = socket.handshake.auth?.token;
-      if (!token) return next(new Error('No token'));
+    // server.use((socket, next) => {
+    //   const token =
+    //     socket.handshake.auth?.token ||
+    //     socket.handshake.query?.token ||
+    //     socket.handshake.headers?.authorization;
+    //   if (!token) {
+    //     return next(new Error('No token'));
+    //   }
 
-      try {
-        const payload = jwt.verify(token, jwtSecret);
-        (socket as any).user = payload; // attach user payload globally
-        next();
-      } catch (err) {
-        next(new Error('Invalid token'));
-      }
-    });
+    //   try {
+    //     const payload = jwt.verify(token, jwtSecret);
+    //     (socket as any).user = payload; // attach user payload globally
+    //     next();
+    //   } catch (err) {
+    //     next(new Error('Invalid token'));
+    //     console.log("Invalid Token");
+    //   }
+    // });
 
     return server;
   }
